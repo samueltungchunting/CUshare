@@ -1,4 +1,3 @@
-# Airbnb-clone
-Learned full stack web development through hands-on practice with online tutorials
+This is one of my personal full-stack web projects. Aimed to provide a platform for CUHK students to share/exchange items 
 
-**I didn't upload the MONGODB link and password**
+The MongoDB link is hidden so if you want to review the project please contact my via email samueltung1205@gmail.com, Thank you~
