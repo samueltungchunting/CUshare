@@ -1,20 +1,19 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 
-const placeSchema = new Schema({
+const itemSchema = new Schema({
     owner: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     title: String,
-    rating: Number,
     address: String,
     photos: [String],
     description: String,
-    perks: [String],
+    cautions: [String],
     extraInfo: String,
-    checkIn: Number,
-    checkOut: Number,
-    maxGuest: Number,
-    price: Number,
+    borrowDate: Date,
+    returnDate: Date,
+    free: Boolean,
+    charge: Number,
 })
 
-const placeModel = mongoose.model("Place", placeSchema)
-module.exports = placeModel 
+const itemModel = mongoose.model("Item", itemSchema)
+module.exports = itemModel 

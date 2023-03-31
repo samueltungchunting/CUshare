@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import axios from 'axios'
 
 const Register = () => {
@@ -8,6 +8,8 @@ const Register = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
+  const [redirectToLogin, setRedirectToLogin] = useState(false)
+
   function clearRegisterForm() {
     setName("")
     setEmail("")
@@ -15,20 +17,23 @@ const Register = () => {
   }
 
   async function submitRegister(e) {
-    e.preventDefault()
-    try {
-      await axios.post('/register', {
-        name,
-        email,
-        password
-      })
-      
-      alert("Registered Successfully!")
+      e.preventDefault()
+      try {
+        await axios.post('/register', {
+            name,
+            email,
+            password
+        })
+        alert("Registered Successfully!")
+        clearRegisterForm()
+        setRedirectToLogin(true)
+      } catch (error) {
+        alert("Error occurs")
+      }
+  }
 
-      clearRegisterForm()
-    } catch (error) {
-      alert("Error occurs")
-    }
+  if(redirectToLogin) {
+    return <Navigate to={'/login'} />
   }
 
   return (

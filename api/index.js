@@ -8,8 +8,8 @@ const imageDownloader = require('image-downloader')
 const fs = require("fs")
 const multer = require("multer")
 const User = require("./models/User.js")
-const Place = require('./models/Place.js')
-const Booking = require('./models/booking.js')
+const Item = require('./models/Item.js')
+const Reservations = require('./models/Reservation.js')
 
 require('dotenv').config()
 const app = express()
@@ -89,6 +89,7 @@ app.post('/logout', (req, res) => {
     res.cookie('token', '').json(true)
 })
 
+
 // At this moment if received an invalid link, the server will crash
 app.post('/upload-by-link', async (req, res) => { 
     const { link } = req.body
@@ -119,80 +120,80 @@ app.post('/upload-by-click', photosClickUploadMiddleware.array('photos', 100), (
     res.json(returnUploadedPhotos)
 })
 
-app.post('/user-accommodation', (req, res) => {
+app.post('/user-item', (req, res) => {
     const {
         title, address, addedPhotos,
-        description, perks, extraInfo, checkIn,
-        checkOut, maxGuests, price
+        description, cautions, extraInfo, 
+        borrowDate, returnDate, charge, free
     } = req.body
     const { token } = req.cookies
     jwt.verify(token, tokenSecret, {}, async (err, userInfo) => {
-        const registeredPlace = await Place.create({
+        const addedItem = await Item.create({
             owner: userInfo.id, title, address, 
-            photos: addedPhotos, description, perks, extraInfo, 
-            checkIn, checkOut, maxGuest: maxGuests, price
+            photos: addedPhotos, description, cautions, extraInfo, 
+            borrowDate, returnDate, charge, free
         })
-        res.json(registeredPlace)
+        res.json(addedItem)
     })
 })
 
-app.get('/user-accommodations', (req, res) => {
+app.get('/user-items', (req, res) => {
     const { token } = req.cookies
     jwt.verify(token, tokenSecret, {}, async (err, userInfo) => {
-        const userPlaceList = await Place.find({ owner: userInfo.id })
-        res.json(userPlaceList)
+        const userItemList = await Item.find({ owner: userInfo.id })
+        res.json(userItemList)
     })
 })
 
-app.get('/single-accommodation/:placeId', async (req, res) => {
-    const { placeId } = req.params
-    const singlePlaceInfo = await Place.findById(placeId)
-    res.json(singlePlaceInfo)
+app.get('/single-item/:itemId', async (req, res) => {
+    const { itemId } = req.params
+    const singleItemInfo = await Item.findById(itemId)
+    res.json(singleItemInfo)
 })
 
-app.put('/single-accommodation', async (req, res) => {
+app.put('/single-item', async (req, res) => {
     const {
-        placeId, title, address, photoLink, addedPhotos,
-        description, perks, extraInfo, checkIn,
-        checkOut, maxGuests, price
+        itemId, title, address, addedPhotos,
+        description, cautions, extraInfo, 
+        borrowDate, returnDate, charge
     } = req.body
-    const singlePlaceInfo = await Place.findById(placeId)
+    const singleItemInfo = await Item.findById(itemId)
     const { token } = req.cookies
     jwt.verify(token, tokenSecret, {}, async (err, userInfo) => {
-        if(userInfo.id === singlePlaceInfo.owner.toString()) {
-            singlePlaceInfo.set({
+        if(userInfo.id === singleItemInfo.owner.toString()) {
+            singleItemInfo.set({
                 title, address, photos: addedPhotos, description,
-                perks, extraInfo, checkIn, checkOut, maxGuest: maxGuests, price
+                cautions, extraInfo, borrowDate, returnDate, charge
             })
-            await singlePlaceInfo.save()
-            res.json("The place info is edited")
+            await singleItemInfo.save()
+            res.json("The Item info is edited")
         }
     })
 })
 
-app.get('/all-accommodations', async (req, res) => {
-    const allAccommodationsInfo = await Place.find()
-    res.json(allAccommodationsInfo)
+app.get('/all-listingItmes', async (req, res) => {
+    const allItemsInfo = await Item.find()
+    res.json(allItemsInfo)
 })
 
-app.get('/place-review/:placeId', async (req, res) => {
-    const { placeId } = req.params
-    const singlePlaceInfo = await Place.findById(placeId)
-    res.json(singlePlaceInfo)
+app.get('/item-review/:itemId', async (req, res) => {
+    const { itemId } = req.params
+    const singleItemInfo = await Item.findById(itemId).populate('owner')
+    res.json(singleItemInfo)
 })
 
 app.post('/reserve', (req, res) => {
     const {
-        placeId, guestNum, userCheckIn, userCheckOut,
-        userName, userPhoneNum, price
+        itemId, userBorrowDate, userReturnDate,
+        userName, userPhoneNum, 
     } = req.body
     const { token } = req.cookies
     try{
         jwt.verify(token, tokenSecret, {} , async (err, userInfo) => {
             if(err) throw err
-            const reserveInfo = await Booking.create({
-                place: placeId, user: userInfo.id, guestNum,
-                userCheckIn, userCheckOut, userName, userPhoneNum, price
+            const reserveInfo = await Reservations.create({
+                item: itemId, user: userInfo.id,
+                userBorrowDate, userReturnDate, userName, userPhoneNum
             })
             res.json(reserveInfo)
         })
@@ -201,12 +202,12 @@ app.post('/reserve', (req, res) => {
     }
 })
 
-app.get('/user-bookings', (req, res) => {
+app.get('/user-reservations', (req, res) => {
     const { token } = req.cookies
     jwt.verify(token, tokenSecret, {}, async (err, userInfo) => {
         if(err) throw err
-        const userBookings = await Booking.find({ user: userInfo.id}).populate('place')
-        res.json(userBookings)
+        const userReservations = await Reservations.find({ user: userInfo.id}).populate('item')
+        res.json(userReservations)
     })
 
 })

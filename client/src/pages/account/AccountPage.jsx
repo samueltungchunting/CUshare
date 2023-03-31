@@ -2,8 +2,6 @@ import axios from 'axios'
 import React, { useContext, useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { UserContext } from '../../UserContext'
-import AccommodationsPage from './accommodation/AccommodationsPage'
-import BookingsPage from './booking/BookingsPage'
 import AccountNavbar from './components/AccountNavbar'
 
 
@@ -33,7 +31,7 @@ const AccountPage = () => {
 
   return (
     <div className='flex flex-col items-center'>
-        <AccountNavbar />
+        {/* <AccountNavbar /> */}
 
         <div className='mt-8'>
             <button onClick={handleLogout} className='rounded-full bg-primary py-2 px-4 text-white hover:underline'>Log out</button>

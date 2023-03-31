@@ -7,10 +7,10 @@ import Register from './pages/RegisterPage'
 import axios from 'axios'
 import {UserContextProvider} from './UserContext'
 import AccountPage from './pages/account/AccountPage'
-import AccommodationsPage from './pages/account/accommodation/AccommodationsPage'
-import AccommodationsFormPage from './pages/account/accommodation/AccommodationsFormPage'
-import BookingsPage from './pages/account/booking/BookingsPage'
-import Place from './pages/place/Place'
+import MyItemsPage from './pages/account/item/MyItemsPage'
+import MyReservationsPage from './pages/account/reservation/MyReservationsPage'
+import Item from './pages/place/Item'
+import MyItemFormPage from './pages/account/item/MyItemFormPage'
 
 // axios.defaults.baseURL = 'http://localhost:4000'
 axios.defaults.baseURL = 'http://127.0.0.1:4000'
@@ -25,11 +25,11 @@ function App() {
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Register />} />
           <Route path='/account' element={<AccountPage />} />
-          <Route path='/account/accommodations' element={<AccommodationsPage />} />
-          <Route path='/account/accommodations/new' element={<AccommodationsFormPage />} />
-          <Route path='/account/accommodations/:placeId' element={<AccommodationsFormPage />} />
-          <Route path='/place/:placeId' element={<Place />} />
-          <Route path='/account/bookings' element={<BookingsPage />} />
+          <Route path='/account/my-items' element={<MyItemsPage />} />
+          <Route path='/account/my-items/new' element={<MyItemFormPage />} />
+          <Route path='/account/my-items/:itemId' element={<MyItemFormPage />} />
+          <Route path='/item/:itemId' element={<Item />} />
+          <Route path='/account/my-reservations' element={<MyReservationsPage />} />
         </Route>
       </Routes>
     </UserContextProvider>

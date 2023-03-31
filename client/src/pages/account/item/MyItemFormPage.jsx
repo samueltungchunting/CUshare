@@ -1,78 +1,77 @@
 import React, { useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom';
 import axios from 'axios'
-import Perks from '../../../share/Perks';
+import Cautions from '../../../share/Cautions';
 import { Alert, AlertTitle } from '@mui/material';
 
-const AccommodationsFormPage = () => {
+const MyItemFormPage = () => {
 
-  const { placeId } = useParams()
+  const { itemId } = useParams()
   useEffect(() => {
-    if(!placeId) return
+    if(!itemId) return
 
-    axios.get(`/single-accommodation/${placeId}`).then(res => {
-      const { data: singlePlaceData } = res
+    axios.get(`/single-item/${itemId}`).then(res => {
+      const { data: singleItemData } = res
       const { owner, title, address, 
-        photos, description, perks, extraInfo, 
-        checkIn, checkOut, maxGuest, price} = singlePlaceData
+        photos, description, cautions, extraInfo, 
+        borrowDate, returnDate, free, charge} = singleItemData
       setTitle(title)
       setAddress(address)
       setAddedPhotos(photos)
       setDescription(description)
-      setPerks(perks)
+      setCautions(cautions)
       setExtraInfo(extraInfo)
-      setCheckIn(checkIn)
-      setCheckOut(checkOut)
-      setMaxGuests(maxGuest)
-      setPrice(price)
+      setFree(free)
+      setBorrowDate(borrowDate)
+      setReturnDate(returnDate)
+      setCharge(charge)
+
       setHighlight(photos[0])
     })
-  }, [placeId])
+  }, [itemId])
 
   const [title,setTitle] = useState('');
   const [address,setAddress] = useState('');
   const [photoLink, setPhotoLink] = useState(""); // this line gonna delete later
   const [addedPhotos,setAddedPhotos] = useState([]);
   const [description,setDescription] = useState('');
-  const [perks,setPerks] = useState([]);
+  const [cautions,setCautions] = useState([]);
   const [extraInfo,setExtraInfo] = useState('');
-  const [checkIn,setCheckIn] = useState('');
-  const [checkOut,setCheckOut] = useState('');
-  const [maxGuests,setMaxGuests] = useState(1);
-  const [price,setPrice] = useState(100);
+  const [free, setFree] = useState(false);
+  const [borrowDate,setBorrowDate] = useState('');
+  const [returnDate,setReturnDate] = useState('');
+  const [charge,setCharge] = useState(100);
 
-  const [redirectToAccommodations, setRedirectToAccommodations] = useState(false)
+  const [redirectToListingItems, setRedirectToListingItems] = useState(false)
   const [highlight, setHighlight] = useState()
 
-    function handleSaveAccommodationsForm(e) { // handling post/put request
-      e.preventDefault()
+    function handleSaveItemsForm(e) { // handling post/put request
+        e.preventDefault()
 
-      console.log("HI");
+        const itemData = {
+          title, address, addedPhotos,
+          description, cautions, extraInfo, 
+          borrowDate, returnDate, charge, free
+        }
 
-      const AccommodationsData = {
-        title, address, photoLink, addedPhotos,
-        description, perks, extraInfo, checkIn,
-        checkOut, maxGuests, price
-      }
-
-      if(placeId) {
-        axios.put(`/single-accommodation`, {
-          placeId, 
-          ...AccommodationsData,
-        }).then(res => {
-          alert(res.data)
-          setRedirectToAccommodations(true)
-        })
-      } else {
-        axios.post('/user-accommodation', AccommodationsData).then(res => {
-          alert("Added Successfully!")
-          setRedirectToAccommodations(true)
-        })
-      }
+        if(itemId) {
+          axios.put(`/single-item`, {
+            itemId, 
+            ...itemData,
+          }).then(res => {
+            alert(res.data)
+            setRedirectToListingItems(true)
+          })
+        } else {
+          axios.post('/user-item', itemData).then(res => {
+            alert("Added Successfully!")
+            setRedirectToListingItems(true)
+          })
+        }
     }
 
-    if(redirectToAccommodations) {
-      return <Navigate to={'/account/accommodations'} />
+    if(redirectToListingItems) {
+      return <Navigate to={'/account/my-items'} />
     }
 
     async function handleUploadByLink(e) {
@@ -146,12 +145,12 @@ const AccommodationsFormPage = () => {
 
   return (
     <div>
-      <form onSubmit={handleSaveAccommodationsForm}>
-        {preInput('Title', 'Title for your place. should be short and catchy as in advertisement')}
-        <input required type="text" value={title} onChange={ev => setTitle(ev.target.value)} placeholder="title, for example: My lovely apt"/>
+      <form onSubmit={handleSaveItemsForm}>
+        {preInput('Title', 'Title for your item. should be short and catchy')}
+        <input required type="text" value={title} onChange={ev => setTitle(ev.target.value)} placeholder="title, for example: Mahjong Table"/>
 
-        {preInput('Address', 'Address to this place')}
-        <input type="text" value={address} onChange={ev => setAddress(ev.target.value)}placeholder="address"/>
+        {preInput('Address', 'Address (inside CUHK is perfered) to wait for each other')}
+        <input type="text" value={address} onChange={ev => setAddress(ev.target.value)}placeholder="address, for example: UC Canteen"/>
 
         {preInput('Photos','More is better')} 
         {/* <PhotosUploader addedPhotos={addedPhotos} onChange={setAddedPhotos} /> */}
@@ -193,51 +192,65 @@ const AccommodationsFormPage = () => {
         </div>
 
 
-        {preInput('Description','Description of the place')}
+        {preInput('Description','Description of the item')}
         <textarea value={description} onChange={ev => setDescription(ev.target.value)} />
 
-        {preInput('Perks','Select all the perks of your place')}
-        <div className="grid mt-2 gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-          <Perks perks={perks} setPerks={setPerks} />
+        {preInput('*Free*', 'giving out this item for free?')}
+        <div className='grid grid-cols-4'>
+          <label className='border p-4 flex rounded-2xl gap-2 items-center cursor-pointer'>
+            <input type='checkbox' checked={free} name='free' onChange={(ev) => setFree(ev.target.checked)}/>
+            <span>Yes, free</span>
+          </label>
         </div>
 
-        {preInput('Extra info','house rules, etc')}
+        {preInput('Extra info','rules for borrowing, etc')}
         <textarea value={extraInfo} onChange={ev => setExtraInfo(ev.target.value)} />
 
-        {preInput('Check in & out times','add check in and out times, remember to have some time window for cleaning the room between guests')}
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
-          <div>
-            <h3 className="mt-2 -mb-1">Check in time</h3>
-            <input type="text"
-                   value={checkIn}
-                   onChange={ev => setCheckIn(ev.target.value)}
-                   placeholder="14:00" />
-          </div>
-          <div>
-            <h3 className="mt-2 -mb-1">Check out time</h3>
-            <input type="text"
-                   value={checkOut}
-                   onChange={ev => setCheckOut(ev.target.value)}
-                   placeholder="12:00" />
-          </div>
-          <div>
-            <h3 className="mt-2 -mb-1">Max number of guests</h3>
-            <input type="number" value={maxGuests}
-                   onChange={ev => setMaxGuests(ev.target.value)}/>
-          </div>
-          <div>
-            <h3 className="mt-2 -mb-1">Price per night</h3>
-            <input type="number" value={price}
-                   onChange={ev => setPrice(ev.target.value)}/>
+        <div className={free? 'hidden': 'mt-4'}>
+          {preInput('Cautions','Select all the cautions of your item')}
+          <div className="grid mt-2 gap-2 grid-cols-2 lg:grid-cols-4">
+            <Cautions cautions={cautions} setCautions={setCautions} />
           </div>
         </div>
+
+        <div className={free? 'hidden': 'mt-8'}>
+          {preInput('Borrow & Return date','add the available borrow date and the return day')}
+          <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
+            <div>
+              <h3 className="mt-2 -mb-1">Borrow date (click the icon)</h3>
+              <input type="date"
+                    className='w-full border my-1 py-2 px-3 rounded-2xl'
+                    value={borrowDate}
+                    onChange={ev => setBorrowDate(ev.target.value)}/>
+            </div>
+            <div>
+              <h3 className="mt-2 -mb-1">Return date (click the icon)</h3>
+              <input type="date"
+                    className='w-full border my-1 py-2 px-3 rounded-2xl'
+                    value={returnDate}
+                    onChange={ev => setReturnDate(ev.target.value)}/>
+            </div>
+            {/* <div>
+              <h3 className="mt-2 -mb-1">Max number of guests</h3>
+              <input type="number" value={maxGuests}
+                    onChange={ev => setMaxGuests(ev.target.value)}/>
+            </div> */}
+            <div>
+              <h3 className="mt-2 -mb-1">Fine charge for late return ($)/day</h3>
+              <input type="number" value={charge}
+                    onChange={ev => setCharge(ev.target.value)}
+                    placeholder='eg. $150'/>
+            </div>
+          </div>
+        </div>
+
         <button className="primary w-full rounded-xl bg-primary text-white py-2 px-4 my-4">Save</button>
       </form>
     </div>
   )
 }
 
-export default AccommodationsFormPage
+export default MyItemFormPage
 
 
         // <Alert severity="success" className='absolute' onChange={() => console.log("123123123123123")}>
