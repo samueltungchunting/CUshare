@@ -16,6 +16,8 @@ const Item = () => {
 
     const [redirectToMyReservationsPage, setRedirectToMyReservationsPage] = useState(false)
 
+    const [loadReady, setLoadReady] = useState(false)
+
     let numOfReserveDays = 0
     if(userBorrowDate && userReturnDate) {
         numOfReserveDays = differenceInCalendarDays(new Date(userBorrowDate), new Date(userReturnDate))
@@ -27,7 +29,7 @@ const Item = () => {
     useEffect(() => {
         axios.get(`/item-review/${itemId}`).then(res => {
             setItemInfo(res.data)
-        })
+        }).then(() => setLoadReady(true))
     }, [])
 
     async function handleReserveItem() {
@@ -98,7 +100,7 @@ const Item = () => {
 
   return (
     <div className='mt-8'>
-        {itemInfo && (
+        {itemInfo && loadReady && (
             <div className=''>
                 <h1 className='text-3xl font-[500] mb-2'>{itemInfo.title}</h1>
                 <div className='flex items-center gap-1 mb-4'>
@@ -149,41 +151,43 @@ const Item = () => {
                         </div>
                     </div>
 
-                    {/* Reserve form */}
-                    <div>
-                        <div className='shadow-xl border rounded-2xl py-6 px-6'>
-                            <h3 className='font-[500] text-xl'> Borrow {numOfReserveDays} <span className='text-md text-gray-700 font-[300]'>day{numOfReserveDays>1? 's': ''}</span></h3>
-                            <div className='border rounded-2xl mt-4'>
-                                <div className='grid grid-cols-2 border-b'>
-                                    <div className='py-3 px-4 border-r'>
-                                        <label className='font-semibold pl-[0.15rem]' for='user-borrowDate'>Your Borrow Date</label><br/>
-                                        <input type='date' id='user-borrowDate' onChange={(e) => setUserBorrowDate(e.target.value)} className='cursor-pointer' required/>
-                                    </div>
-                                    <div className='py-4 px-4'>
-                                        <label className='font-semibold pl-[0.15rem]' for='user-returnDate'>Your Return Date</label><br/>
-                                        <input type='date' id='user-returnDate' value={userReturnDate} onChange={(e) => setUserReturnDate(e.target.value)} className='cursor-pointer' required/>
-                                    </div>
-                                </div>
-                                {numOfReserveDays > 0 && <hr/>}
-                                {numOfReserveDays > 0 && (
-                                    <div className='py-4 px-4'>
-                                        <div>
-                                            <p className='font-semibold pl-[0.15rem]'>Your full name:</p>
-                                            <input type='text' onChange={(e) => setUserName(e.target.value)}/>
+                    {/* Reserve form, will not display if already reserved */}
+                    {!itemInfo.isReserved && loadReady && (
+                        <div>
+                            <div className='shadow-xl border rounded-2xl py-6 px-6'>
+                                <h3 className='font-[500] text-xl'> Borrow {numOfReserveDays} <span className='text-md text-gray-700 font-[300]'>day{numOfReserveDays>1? 's': ''}</span></h3>
+                                <div className='border rounded-2xl mt-4'>
+                                    <div className='grid grid-cols-2 border-b'>
+                                        <div className='py-3 px-4 border-r'>
+                                            <label className='font-semibold pl-[0.15rem]' for='user-borrowDate'>Your Borrow Date</label><br/>
+                                            <input type='date' id='user-borrowDate' onChange={(e) => setUserBorrowDate(e.target.value)} className='cursor-pointer' required/>
                                         </div>
-                                        <div className='mt-4'>
-                                            <p className='font-semibold pl-[0.15rem]'>Phone number:</p>
-                                            <input type='tel' onChange={(e) => setUserPhoneNum(e.target.value)} />
+                                        <div className='py-4 px-4'>
+                                            <label className='font-semibold pl-[0.15rem]' for='user-returnDate'>Your Return Date</label><br/>
+                                            <input type='date' id='user-returnDate' value={userReturnDate} onChange={(e) => setUserReturnDate(e.target.value)} className='cursor-pointer' required/>
                                         </div>
                                     </div>
-                                )}
-                                <hr/>
-                                <div className='py-4 px-4'>
-                                    <button onClick={handleReserveItem} className='bg-primary text-white py-2 px-4 rounded-xl w-full hover:underline'>Reserve</button>
+                                    {numOfReserveDays > 0 && <hr/>}
+                                    {numOfReserveDays > 0 && (
+                                        <div className='py-4 px-4'>
+                                            <div>
+                                                <p className='font-semibold pl-[0.15rem]'>Your full name:</p>
+                                                <input type='text' onChange={(e) => setUserName(e.target.value)}/>
+                                            </div>
+                                            <div className='mt-4'>
+                                                <p className='font-semibold pl-[0.15rem]'>Phone number:</p>
+                                                <input type='tel' onChange={(e) => setUserPhoneNum(e.target.value)} />
+                                            </div>
+                                        </div>
+                                    )}
+                                    <hr/>
+                                    <div className='py-4 px-4'>
+                                        <button onClick={handleReserveItem} className='bg-primary text-white py-2 px-4 rounded-xl w-full hover:underline'>Reserve</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                 </div>
             </div>

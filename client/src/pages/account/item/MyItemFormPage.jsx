@@ -22,8 +22,8 @@ const MyItemFormPage = () => {
       setCautions(cautions)
       setExtraInfo(extraInfo)
       setFree(free)
-      setBorrowDate(borrowDate)
-      setReturnDate(returnDate)
+      setBorrowDate(borrowDate.substr(0, 10))
+      setReturnDate(returnDate.substr(0, 10))
       setCharge(charge)
 
       setHighlight(photos[0])

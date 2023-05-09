@@ -13,6 +13,7 @@ const itemSchema = new Schema({
     returnDate: Date,
     free: Boolean,
     charge: Number,
+    isReserved: {type: Boolean, default: false},
 })
 
 const itemModel = mongoose.model("Item", itemSchema)

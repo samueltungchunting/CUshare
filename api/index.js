@@ -171,7 +171,7 @@ app.put('/single-item', async (req, res) => {
     })
 })
 
-app.get('/all-listingItmes', async (req, res) => {
+app.get('/api/home_allItems', async (req, res) => {
     const allItemsInfo = await Item.find()
     res.json(allItemsInfo)
 })
@@ -182,7 +182,7 @@ app.get('/item-review/:itemId', async (req, res) => {
     res.json(singleItemInfo)
 })
 
-app.post('/reserve', (req, res) => {
+app.post('/reserve', async (req, res) => {
     const {
         itemId, userBorrowDate, userReturnDate,
         userName, userPhoneNum, 
@@ -197,6 +197,8 @@ app.post('/reserve', (req, res) => {
             })
             res.json(reserveInfo)
         })
+        const updatedReserveStatus = await Item.findOneAndUpdate({_id: itemId}, {isReserved: true}, {new: true})
+        console.log(updatedReserveStatus);
     } catch (err) {
         res.json("Input errors")
     }
