@@ -22,13 +22,15 @@ const MyItemFormPage = () => {
       setCautions(cautions)
       setExtraInfo(extraInfo)
       setFree(free)
-      setBorrowDate(borrowDate.substr(0, 10))
-      setReturnDate(returnDate.substr(0, 10))
+      setBorrowDate(borrowDate.slice(0, 10))
+      setReturnDate(returnDate.slice(0, 10))
       setCharge(charge)
 
       setHighlight(photos[0])
     })
   }, [itemId])
+
+  // const currentDate = new Date().toISOString().slice(1, 10)
 
   const [title,setTitle] = useState('');
   const [address,setAddress] = useState('');
@@ -38,8 +40,8 @@ const MyItemFormPage = () => {
   const [cautions,setCautions] = useState([]);
   const [extraInfo,setExtraInfo] = useState('');
   const [free, setFree] = useState(false);
-  const [borrowDate,setBorrowDate] = useState('');
-  const [returnDate,setReturnDate] = useState('');
+  const [borrowDate,setBorrowDate] = useState(new Date().toISOString().slice(0, 10));
+  const [returnDate,setReturnDate] = useState(new Date().toISOString().slice(0, 10));
   const [charge,setCharge] = useState(100);
 
   const [redirectToListingItems, setRedirectToListingItems] = useState(false)
@@ -146,7 +148,7 @@ const MyItemFormPage = () => {
   return (
     <div>
       <form onSubmit={handleSaveItemsForm}>
-        {preInput('Title', 'Title for your item. should be short and catchy')}
+        {preInput('Title*', 'Title for your item. should be short and catchy')}
         <input required type="text" value={title} onChange={ev => setTitle(ev.target.value)} placeholder="title, for example: Mahjong Table"/>
 
         {preInput('Address', 'Address (inside CUHK is perfered) to wait for each other')}
@@ -237,7 +239,8 @@ const MyItemFormPage = () => {
             </div> */}
             <div>
               <h3 className="mt-2 -mb-1">Fine charge for late return ($)/day</h3>
-              <input type="number" value={charge}
+              <input type="number" 
+                    value={charge}
                     onChange={ev => setCharge(ev.target.value)}
                     placeholder='eg. $150'/>
             </div>
@@ -251,9 +254,3 @@ const MyItemFormPage = () => {
 }
 
 export default MyItemFormPage
-
-
-        // <Alert severity="success" className='absolute' onChange={() => console.log("123123123123123")}>
-        //   <AlertTitle>Success!</AlertTitle>
-        //   This is a success alert — <strong>check it out!</strong>
-        // </Alert>

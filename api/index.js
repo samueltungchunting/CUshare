@@ -145,6 +145,12 @@ app.get('/user-items', (req, res) => {
     })
 })
 
+app.delete('/user-deleteItems/:itemID', async (req, res) => {
+    const {itemID} = req.params
+    const deletedItem = await Item.findByIdAndDelete({_id: itemID}) // findByIdAndRemove returns the original one
+    res.json(deletedItem)
+})
+
 app.get('/single-item/:itemId', async (req, res) => {
     const { itemId } = req.params
     const singleItemInfo = await Item.findById(itemId)
@@ -198,7 +204,6 @@ app.post('/reserve', async (req, res) => {
             res.json(reserveInfo)
         })
         const updatedReserveStatus = await Item.findOneAndUpdate({_id: itemId}, {isReserved: true}, {new: true})
-        console.log(updatedReserveStatus);
     } catch (err) {
         res.json("Input errors")
     }
@@ -211,9 +216,17 @@ app.get('/user-reservations', (req, res) => {
         const userReservations = await Reservations.find({ user: userInfo.id}).populate('item')
         res.json(userReservations)
     })
-
 })
 
+app.delete('/user-cancelReservations/:reservationID', async(req, res) => {
+    const { reservationID } = req.params
+
+    const reservedItem = await Reservations.findById(reservationID)
+    const reservedItemID = reservedItem.item
+    await Item.findOneAndUpdate({_id: reservedItemID}, {isReserved: false}, {new: true})
+    const cancelledReservation = await Reservations.findByIdAndDelete({_id: reservationID})
+    res.json(cancelledReservation)
+})
 
 app.listen(4000)
 
