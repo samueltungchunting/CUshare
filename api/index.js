@@ -1,18 +1,18 @@
 const express = require('express')
-const cors = require('cors')
+const cors = require('cors')  // treat as allowing incoming request
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser')
-const imageDownloader = require('image-downloader')
+const imageDownloader = require('image-downloader') // handle image location and downlaod
 const fs = require("fs")
-const multer = require("multer")
+const multer = require("multer")  // handle form-data requests
 const User = require("./models/User.js")
 const Item = require('./models/Item.js')
 const Reservations = require('./models/Reservation.js')
 
-require('dotenv').config()
-const app = express()
+require('dotenv').config()  // enable to get the .env variables
+const app = express()  
 
 const tokenSecret = 'sklas3j39fdsfajf320if'
 const UserSalt = bcrypt.genSaltSync(10)
